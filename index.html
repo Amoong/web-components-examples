@@ -2,29 +2,87 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Web Components Examples</title>
-  <script src="./main.js" defer />
-  </script>
+  <meta charset="UTF-8">
+  <title>Expanding list web component</title>
+  <style>
+    ul {
+      list-style-type: none;
+    }
 
+    li::before {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.25rem;
+      content: "";
+    }
+
+    .open::before,
+    .closed::before {
+      background-size: 1rem 1rem;
+      position: relative;
+      top: 0.25rem;
+      opacity: 0.3;
+    }
+
+    .open::before {
+      background-image: url(img/down.png);
+    }
+
+    .closed::before {
+      background-image: url(img/right.png);
+    }
+
+    .closed .closed::before,
+    .closed .open::before {
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Pop-up info widget - web components</h1>
+  <h1>Expanding list web component</h1>
+  <ul is="expanding-list">
+    <li>UK
+      <ul>
+        <li>Yorkshire
+          <ul>
+            <li>Leeds
+              <ul>
+                <li>Train station</li>
+                <li>Town hall</li>
+                <li>Headrow</li>
+              </ul>
+            </li>
+            <li>Bradford</li>
+            <li>Hull</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>USA
+      <ul>
+        <li>California
+          <ul>
+            <li>Los Angeles</li>
+            <li>San Francisco</li>
+            <li>Berkeley</li>
+          </ul>
+        </li>
+        <li>Nevada</li>
+        <li>Oregon</li>
+      </ul>
+    </li>
+  </ul>
 
-  <form>
-    <div>
-      <label for="cvc">Enter your CVC
-        <popup-info img="img/alt.png"
-          data-text="Your card validation code (CVC) is an extra security feature — it is the last 3 or 4 numbers on the back of your card.">
-        </popup-info>
-      </label>
-      <input type="text" id="cvc">
-    </div>
-  </form>
+  <ul>
+    <li>Not</li>
+    <li>an</li>
+    <li>expanding</li>
+    <li>list</li>
+  </ul>
 
+  <script src="main.js"></script>
 </body>
 
 </html>

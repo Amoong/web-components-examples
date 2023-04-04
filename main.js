@@ -1,51 +1,63 @@
 // Create a class for the element
-class PopUpInfo extends HTMLElement {
+class ExpandingList extends HTMLUListElement {
   constructor() {
     // Always call super first in constructor
-    super();
+    // Return value from super() is a reference
+    self = super();
 
-    // Create a shadow root
-    const shadow = this.attachShadow({ mode: "open" });
+    // Get ul and li elements that are a child of this custom ul element
+    // li elements can be containers if they have uls within them
+    const uls = Array.from(self.querySelectorAll("ul"));
+    const lis = Array.from(self.querySelectorAll("li"));
 
-    // Create spans
-    const wrapper = document.createElement("span");
-    wrapper.setAttribute("class", "wrapper");
+    // Hide all child uls
+    // These lists will be shown when the user clicks a higher level container
+    uls.forEach((ul) => {
+      ul.style.display = "none";
+    });
 
-    const icon = document.createElement("span");
-    icon.setAttribute("class", "icon");
-    icon.setAttribute("tabindex", 0);
+    // Look through each li elemnt in the ul
+    lis.forEach((li) => {
+      // If this li has a ul as a child, decorate it and add a click handler
+      if (li.querySelectorAll("ul").length > 0) {
+        // Add an attribute which can be used by the style
+        // to show and open or closed icon
+        li.setAttribute("class", "closed");
 
-    const info = document.createElement("span");
-    info.setAttribute("class", "info");
+        // Wrap the li element's text in a new span element
+        // so we can assign style and event handlers to the span
+        const childText = li.childNodes[0];
+        const newSpan = document.createElement("span");
 
-    // Take attribute content and put it inside the info span
-    const text = this.getAttribute("data-text");
-    info.textContent = text;
+        // Copy text from li to span, set cursor style
+        newSpan.textContent = childText.textContent;
+        newSpan.style.cursor = "pointer";
 
-    // Insert icon
-    let imgUrl;
-    if (this.hasAttribute("img")) {
-      imgUrl = this.getAttribute("img");
-    } else {
-      imgUrl = "img/default.png";
-    }
+        // Add click handler to this span
+        newSpan.onclick = self.showul;
 
-    const img = document.createElement("img");
-    img.src = imgUrl;
-    icon.appendChild(img);
-
-    // Apply external styles to the shadow dom
-    const linkElem = document.createElement("link");
-    linkElem.setAttribute("rel", "stylesheet");
-    linkElem.setAttribute("href", "style.css");
-
-    // Attach the created elements to the shadow dom
-    shadow.appendChild(linkElem);
-    shadow.appendChild(wrapper);
-    wrapper.appendChild(icon);
-    wrapper.appendChild(info);
+        // Add the span and remove the bare text node from the li
+        childText.parentNode.insertBefore(newSpan, childText);
+        childText.parentNode.removeChild(childText);
+      }
+    });
   }
+
+  // li click handler
+  showul = function (e) {
+    // next sibling to the span should be the ul
+    const nextul = e.target.nextElementSibling;
+
+    // Toggle visible state and update class attribute on ul
+    if (nextul.style.display === "block") {
+      nextul.style.display = "none";
+      nextul.parentNode.setAttribute("class", "closed");
+    } else {
+      nextul.style.display = "block";
+      nextul.parentNode.setAttribute("class", "open");
+    }
+  };
 }
 
 // Define the new element
-customElements.define("popup-info", PopUpInfo);
+customElements.define("expanding-list", ExpandingList, { extends: "ul" });
